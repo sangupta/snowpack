@@ -352,6 +352,11 @@ public class Snowpack {
 	 * 
 	 */
 	public void close() throws IOException {
+		if(this.closed) {
+			// already closed
+			return;
+		}
+		
 		// close this one
 		this.closed = true;
 		
@@ -371,6 +376,34 @@ public class Snowpack {
 		
 		// write the metadata
 		this.writeCurrentMetadata();
+	}
+	
+ 	/**
+	 * Register a shutdown hook with the Java runtime. Useful for web applications
+	 * when closing of the pack might not be initiated from code due to direct shutdown
+	 * of the container.
+	 * 
+	 */
+	public void registerShutdownHook() {
+		Runtime.getRuntime().addShutdownHook(new Thread() {
+			
+			/**
+			 * @see java.lang.Thread#run()
+			 */
+			@Override
+			public void run() {
+				super.run();
+				
+				// close snowpack
+				try {
+					Snowpack.this.close();
+				} catch (IOException e) {
+					System.out.println("Unable to shutdown snowpack cleanly.");
+					e.printStackTrace();
+				}
+			}
+			
+		});
 	}
 	
 	/**
