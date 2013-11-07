@@ -123,6 +123,8 @@ public class SnowpackRecover {
 		// iterate over all chunks
 		List<ChunkInfo> chunkInfos = new ArrayList<ChunkInfo>();
 		
+		int totalFiles = 0;
+		
 		for(Entry<Integer, File> entry : validChunks.entrySet()) {
 			File chunkFile = entry.getValue();
 			int chunkID = entry.getKey();
@@ -148,6 +150,7 @@ public class SnowpackRecover {
 			
 			// add to list of chunk infos
 			chunkInfos.add(chunkInfo);
+			totalFiles += chunkInfo.numFiles;
 			System.out.println("recovered!");
 			
 			System.out.println("Recovered chunk-info: " + chunkInfo);
@@ -166,6 +169,9 @@ public class SnowpackRecover {
 		// save this chunk info file
 		Collections.sort(chunkInfos);
 		writeSnowpackMeta(baseDirectory, chunkInfos);
+		
+		// output total files
+		System.out.println("Total number of files in pack: " + totalFiles);
 	}
 
 	/**

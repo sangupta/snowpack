@@ -60,7 +60,7 @@ public abstract class ChunkIO implements Closeable {
 	/**
 	 * Keeps track of number of files in this chunk
 	 */
-	protected int numFiles;
+	protected volatile int numFiles;
 	
 	/**
 	 * The lock to syncrhonize multiple threads writing the same file

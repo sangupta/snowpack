@@ -91,7 +91,7 @@ public class ChunkInfo implements Comparable<ChunkInfo> {
 			return -1;
 		}
 		
-		return 0 - (this.chunkID - o.chunkID);
+		return this.chunkID - o.chunkID;
 	}
 	
 }

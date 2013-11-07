@@ -32,11 +32,11 @@ import com.sangupta.snowpack.Snowpack;
  */
 public class SnowpackConfig {
 
-	public long preAllocationChunkSize = 10 * 1024l * 1024l; // max chunk size if 10 MB
+	public long preAllocationChunkSize = 100 * 1024l * 1024l; // max chunk size if 100 MB
 	
-	public long maxFileSize = 10 * 1024l * 1024l; // max file size of 10 MB
+	public long maxFileSize = 100 * 1024l * 1024l; // max chunk size of 100 MB
 	
-	public long averageExpectedSize = 20 * 1024l; // 20 kb
+	public long averageExpectedSize = 5l * 1024l * 1024l; // 20 kb
 	
 	public boolean readCachingEnabled = true;
 	

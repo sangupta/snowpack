@@ -43,8 +43,9 @@ public class ChunkReader extends ChunkIO implements Closeable {
 	 * @param baseDirectory
 	 * @throws FileNotFoundException 
 	 */
-	public ChunkReader(File chunkFile, int chunkIndex) throws FileNotFoundException {
+	public ChunkReader(File chunkFile, int chunkIndex, int numFiles) throws FileNotFoundException {
 		super(chunkFile, chunkIndex, "r");
+		this.numFiles = numFiles;
 	}
 
 	/**

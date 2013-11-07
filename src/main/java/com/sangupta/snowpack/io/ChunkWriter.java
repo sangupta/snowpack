@@ -182,6 +182,15 @@ public class ChunkWriter extends ChunkIO {
 		// write the info to disk
 		this.metadataDB.save(flakeMeta);
 		
+		return isOverflow();
+	}
+	
+	/**
+	 * Check if we are overflowing with data or not?
+	 * 
+	 * @return
+	 */
+	public boolean isOverflow() {
 		// check if we are overboard or not
 		if(this.currentWritePointer > this.snowpackConfig.maxFileSize) {
 			return true;
@@ -205,7 +214,7 @@ public class ChunkWriter extends ChunkIO {
 		this.close();
 		
 		// open the reader
-		return new ChunkReader(this.chunkFile, this.chunkIndex);
+		return new ChunkReader(this.chunkFile, this.chunkIndex, this.numFiles);
 	}
 	
 	/**
@@ -270,6 +279,10 @@ public class ChunkWriter extends ChunkIO {
 			final long length = handler.length();
 			while(handler.getFilePointer() < length) {
 				int nameLength = handler.readInt();
+//				if(nameLength <= 0) {
+//					break;
+//				}
+				
 				byte[] name = new byte[nameLength];
 				handler.readFully(name);
 				

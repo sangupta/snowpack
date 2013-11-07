@@ -164,7 +164,7 @@ public class Snowpack {
 		
 		// start reading all chunks
 		for(int index = 0; index < this.meta.numChunks - 1; index++) {
-			ChunkReader reader = new ChunkReader(getChunkFile(index), index);
+			ChunkReader reader = new ChunkReader(getChunkFile(index), index, this.meta.chunks.get(index).numFiles);
 			this.chunkReaders.add(reader);
 		}
 		
@@ -315,25 +315,8 @@ public class Snowpack {
 
 			// check if the chunk is full or not
 			if(overflow) {
-				// we need to roll over
-				int index = this.meta.numChunks++;
-				ChunkWriter newWriter = new ChunkWriter(getChunkFile(index), 0l, index, this.metadataDB, this.configuration);
-				
-				// switch if no other thread has switched till now
-				boolean updated = this.chunkWriter.compareAndSet(myWriter, newWriter);
-				
-				if(updated) {
-					// make the current chunk writer a chunk reader
-					ChunkReader reader = myWriter.getReader();
-					
-					// add this to global readers
-					this.chunkReaders.add(reader);
-					
-					// release current writer
-					myWriter = null;
-
-					// output the metadata
-					this.writeCurrentMetadata();
+				synchronized(this) {
+					rollOverWriter(myWriter);
 				}
 			}
 			
@@ -344,6 +327,38 @@ public class Snowpack {
 		}
 		
 		return false;
+	}
+
+	/**
+	 * @param myWriter
+	 * @throws IOException
+	 */
+	private void rollOverWriter(ChunkWriter myWriter) throws IOException {
+		ChunkWriter currentWriter = this.chunkWriter.get();
+		if(!currentWriter.isOverflow()) {
+			return;
+		}
+		
+		// we need to roll over
+		int index = this.meta.numChunks++;
+		ChunkWriter newWriter = new ChunkWriter(getChunkFile(index), 0l, index, this.metadataDB, this.configuration);
+		
+		// switch if no other thread has switched till now
+		boolean updated = this.chunkWriter.compareAndSet(myWriter, newWriter);
+		
+		if(updated) {
+			// make the current chunk writer a chunk reader
+			ChunkReader reader = myWriter.getReader();
+			
+			// add this to global readers
+			this.chunkReaders.add(reader);
+			
+			// release current writer
+			myWriter = null;
+
+			// output the metadata
+			this.writeCurrentMetadata();
+		}
 	}
 	
 	/**
